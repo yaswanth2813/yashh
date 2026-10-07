@@ -28,5 +28,20 @@
     "videoUrl": "",
     "magnet": "magnet:?xt=urn:btih:5865f59d7c6374ce9fbbba7d67f5ec58a9157168",
     "dataPath": "/Mirai (2025) TRUE WEB-DL - 4K SDR - HEVC - [Tam + Tel + Mal + Kan] - (DD+5.1 - 192Kbps & AAC) - 14GB - ESub.mkv"
+  },
+  {
+    "id": 3,
+    "type": "movie",
+    "tmdbid": 1423251,
+    "heading": "Biker",
+    "poster": "",
+    "backdrop": "",
+    "year": 2025,
+    "genre": "Drama, Fantasy",
+    "starring": "Haruka Ayase, Moka Kamishiraishi",
+    "director": "Mamoru Hosoda",
+    "videoUrl": "",
+    "magnet": "magnet:?xt=urn:btih:00129813601b4fb3f8f26efeacff8478690d8813",
+    "dataPath": "/Biker (2026) TRUE WEB-DL - 4K SDR - 2160p HQ - HEVC - UNTOUCHED - [Tamil + Telugu + Hindi + Malayalam + Kannada].mkv"
   }
 ]
