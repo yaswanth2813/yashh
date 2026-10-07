@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "type": "movie",
+    "tmdbid": 969681,
+    "heading": "Spider-Man: Brand New Day",
+    "poster": "",
+    "backdrop": "",
+    "year": 2026,
+    "genre": "Action, Adventure, Sci-Fi",
+    "starring": "",
+    "director": "",
+    "videoUrl": "",
+    "magnet": "magnet:?xt=urn:btih:dc502795caa54d23e756f61b8994fd0c019767d8",
+    "dataPath": "/Spider Man Brand New Day (2026) English HQ HDRip - 1080p - x264 - (DD5.1 - 192Kbps & AAC) - 2.9GB - ESub.mkv"
+  },
+  {
+    "id": 2,
+    "type": "movie",
+    "tmdbid": 0,
+    "heading": "Mirai",
+    "poster": "",
+    "backdrop": "",
+    "year": 2025,
+    "genre": "Drama, Fantasy",
+    "starring": "Haruka Ayase, Moka Kamishiraishi",
+    "director": "Mamoru Hosoda",
+    "videoUrl": "",
+    "magnet": "magnet:?xt=urn:btih:5865f59d7c6374ce9fbbba7d67f5ec58a9157168",
+    "dataPath": "/Mirai (2025) TRUE WEB-DL - 4K SDR - HEVC - [Tam + Tel + Mal + Kan] - (DD+5.1 - 192Kbps & AAC) - 14GB - ESub.mkv"
+  }
+]

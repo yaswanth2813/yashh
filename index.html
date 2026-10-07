@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yash OTT</title>
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dal4gg4v9/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1769530980/IMG_20260127_214934_ytx23w.png" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+<style>
+body{
+  background:#0f1115;
+  color:#fff;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont;
+}
+
+/* ================= SEARCH ================= */
+.search-wrap{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  padding:15px 20px;
+  background:#0f1115;
+}
+#searchInput{
+  width:100%;
+  padding:12px 16px;
+  border-radius:30px;
+  border:none;
+  outline:none;
+  background:#1a1d24;
+  color:#fff;
+}
+#searchInput::placeholder{color:#888}
+#searchSuggestions{
+  position:absolute;
+  left:20px;
+  right:20px;
+  top:65px;
+  background:#151821;
+  border-radius:14px;
+  max-height:360px;
+  overflow-y:auto;
+  display:none;
+}
+.suggestion{
+  display:flex;
+  gap:12px;
+  padding:10px;
+  cursor:pointer;
+}
+.suggestion:hover{background:#1f2330}
+.suggestion img{
+  width:50px;
+  height:70px;
+  border-radius:8px;
+  object-fit:cover;
+}
+
+/* ================= SKELETON ================= */
+.skeleton{
+  background:#1a1d24;
+  border-radius:14px;
+  position:relative;
+  overflow:hidden;
+}
+.skeleton::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    110deg,
+    rgba(255,255,255,0) 30%,
+    rgba(255,255,255,.08) 45%,
+    rgba(255,255,255,0) 60%
+  );
+  animation:shimmer 1.2s infinite;
+}
+@keyframes shimmer{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(100%)}
+}
+.hero-skeleton{
+  height:60vh;
+  margin:20px;
+  border-radius:18px;
+}
+.card-skeleton{
+  min-width:160px;
+  height:240px;
+  flex:0 0 auto;
+}
+
+/* ================= HERO ================= */
+.hero{
+  display:none;
+  position:relative;
+  height:60vh;
+  border-radius:18px;
+  overflow:hidden;
+  margin:20px;
+}
+.hero-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:top;
+  filter:blur(1px) brightness(.55);
+  transform:scale(1.2);
+}
+#hero-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0;
+  transition:opacity .6s;
+}
+.hero.video-active #hero-video{opacity:1}
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,.2),rgba(0,0,0,.95));
+}
+.hero-content{
+  position:relative;
+  z-index:2;
+  padding:40px;
+  max-width:600px;
+}
+.hero:hover #hero-video { opacity: 1 !important; }
+
+
+/* ================= ROWS ================= */
+.row-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:20px 20px 10px;
+}
+.view-all{
+  font-size:14px;
+  color:#bbb;
+  cursor:pointer;
+}
+.view-all:hover{color:#fff;text-decoration:underline}
+.ott-row{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  padding:0 20px 10px;
+}
+
+/* ================= CARD ================= */
+.preview-card{
+  position:relative;
+  min-width:160px;
+  cursor:pointer;
+}
+.preview-card img,
+.preview-card video{
+  width:100%;
+  height:240px;
+  object-fit:cover;
+  border-radius:14px;
+}
+.preview-card video{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  pointer-events:none;
+}
+    
+.preview-card:hover img{opacity:100%}
+.ott-title{
+  font-size:14px;
+  text-align:center;
+  margin-top:6px;
+  color:#ccc;
+}
+/* ===== VIEW ALL GRID RESPONSIVE FIX ===== */
+.view-all-grid{
+  display:grid;
+  gap:18px;
+  padding:20px;
+}
+
+/* Mobile (2 columns) */
+@media (max-width:575px){
+  .view-all-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+/* Tablet (3 columns) */
+@media (min-width:576px) and (max-width:991px){
+  .view-all-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+/* Desktop / Large screens (5 columns) */
+@media (min-width:992px){
+  .view-all-grid{
+    grid-template-columns:repeat(5,1fr);
+  }
+}
+/* ================= HERO ================= */
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,.2),
+    rgba(0,0,0,.95)
+  );
+  pointer-events: none; /* 🔑 IMPORTANT */
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="container-fluid">
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <input id="searchInput" placeholder="Search movies..." autocomplete="off">
+  <div id="searchSuggestions"></div>
+</div>
+
+
+
+
+<!-- HERO SKELETON -->
+<div class="skeleton hero-skeleton" id="hero-skeleton"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg" id="hero-bg"></div>
+  <video id="hero-video" muted loop playsinline preload="metadata"></video>
+  <div class="hero-content">
+    <h1 id="hero-title"></h1>
+    <a id="hero-link" class="btn btn-light">Watch Now</a>
+  </div>
+</div>
+
+<!-- ROWS -->
+<div id="rows">
+  <div class="row-header"><h4>Loading…</h4></div>
+  <div class="ott-row">
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+  </div>
+
+</div>
+
+<script>
+  
+const POSTS_JSON_URL="posts.json";
+const isTouch=('ontouchstart'in window)||navigator.maxTouchPoints>0;
+const isLowEnd=navigator.hardwareConcurrency<=4||navigator.deviceMemory<=4;
+let allPosts=[];
+const heroBg = document.getElementById("hero-bg");
+const heroTitle = document.getElementById("hero-title");
+const heroLink = document.getElementById("hero-link");
+const heroSkeleton = document.getElementById("hero-skeleton");
+const heroBox = document.querySelector(".hero");
+const rows = document.getElementById("rows");
+const ENABLE_TMDB_POSTER_FILL = true;
+
+
+
+
+
+
+
+
+/*globally adding */
+async function fetchTMDBDetails(tmdbid){
+  try{
+    const res = await fetch(
+      `https://api.themoviedb.org/3/movie/${tmdbid}?api_key=${TMDB_API_KEY}`
+    );
+    if(!res.ok) return null;
+    return await res.json();
+  }catch{
+    return null;
+  }
+}
+
+async function resolvePoster(post){
+  if(post.poster) return post.poster;              // JSON wins
+  if(!ENABLE_TMDB_POSTER_FILL || !post.tmdbid) return null;
+
+  const movie = await fetchTMDBDetails(post.tmdbid);
+  return movie?.poster_path
+    ? TMDB_IMG + movie.poster_path
+    : null;
+}
+
+
+/* ===== TMDB CONFIG ===== */
+const TMDB_API_KEY="532a88c1ce983a87d6b28e49ad40a68e";
+const TMDB_IMG="https://image.tmdb.org/t/p/original";
+const BACKDROP_TTL=86400000;
+
+/* ========== AUDIO FADE ========== */
+function fadeInAudio(v){
+  v.muted=false;v.volume=0;
+  let vol=0;
+  v._fade=setInterval(()=>{
+    vol+=0.1;
+    v.volume=Math.min(vol,0.6);
+    if(vol>=0.6) clearInterval(v._fade);
+  },80);
+}
+
+/* ========== AUTO PAUSE OFFSCREEN ========== */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting){
+      const v=e.target.querySelector("video");
+      if(v){
+        clearInterval(v._loopTimer);
+        v.pause();
+      }
+    }
+  });
+},{threshold:.3});
+
+/* ===== RELEASE DATE CACHE ===== */
+const RELEASE_CACHE_KEY = "releaseDateCache_v1";
+
+function getReleaseCache(){
+  try{
+    return JSON.parse(localStorage.getItem(RELEASE_CACHE_KEY)) || {};
+  }catch{
+    return {};
+  }
+}
+
+function setReleaseCache(cache){
+  localStorage.setItem(RELEASE_CACHE_KEY, JSON.stringify(cache));
+}
+
+function getCacheKey(post){
+  return post.tmdbid
+    ? `tmdb_${post.tmdbid}`
+    : `title_${post.heading.toLowerCase()}`;
+}
+
+/* ===== FETCH RELEASE DATE (SMART + CACHE) ===== */
+async function fetchReleaseDateSmart(post){
+  try{
+    if(post.release_date) return post.release_date;
+
+    const cache = getReleaseCache();
+    const cacheKey = getCacheKey(post);
+
+    // ✅ 1. CACHE HIT
+    if(cache[cacheKey]) return cache[cacheKey];
+
+    let movie = null;
+
+    // 2️⃣ TMDB by ID
+    if(post.tmdbid){
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${post.tmdbid}?api_key=${TMDB_API_KEY}`
+      );
+      if(res.ok) movie = await res.json();
+    }
+
+    // 3️⃣ Fallback search
+    if(!movie){
+      const res = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(post.heading)}`
+      );
+      const data = await res.json();
+      movie = data.results?.[0];
+    }
+
+    const date = movie?.release_date || null;
+
+    // ✅ SAVE TO CACHE
+    if(date){
+      cache[cacheKey] = date;
+      setReleaseCache(cache);
+    }
+
+    return date;
+
+  }catch(e){
+    console.warn("Release date fetch failed:", post.heading);
+    return null;
+  }
+}
+
+
+/* ===== FETCH BACKDROP ===== */
+
+async function fetchBackdropSmart(post){
+  try{
+    let movie = null;
+
+    /* ========= 1. IF TMDB ID EXISTS ========= */
+    if(post.tmdbid){
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${post.tmdbid}?api_key=${TMDB_API_KEY}`
+      );
+      if(res.ok){
+        movie = await res.json();
+      }
+    }
+
+
+
+    /* ========= 2. FALLBACK TO SEARCH ========= */
+    if(!movie){
+      const res = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(post.heading)}`
+      );
+      const data = await res.json();
+      movie = data.results?.find(m => m.backdrop_path);
+    }
+
+    return movie?.backdrop_path
+      ? TMDB_IMG + movie.backdrop_path
+      : null;
+
+  }catch(err){
+    console.error("TMDB error:", err);
+    return null;
+  }
+}
+
+
+
+/* ===== CARD HTML ===== */
+function cardHTML(p){
+return `
+<div class="preview-card" data-id="${p.id}"
+${isTouch?`
+onclick="
+  const v=this.querySelector('video');
+  if(!v){location.href='post.html?id=${p.id}';return;}
+  if(!v._playing){
+    v.muted=true;
+    v.currentTime=Math.random()*(v.duration-4);
+    v.play();v._playing=true;
+  }else location.href='post.html?id=${p.id}';
+"`:""}>
+<img src="${p.poster || p.__poster}" class="skeleton">
+${!isTouch && p.videoUrl?`
+<video muted preload="none" playsinline>
+  <source src="${p.videoUrl}" type="video/mp4">
+</video>`:""}
+<div class="ott-title">${p.heading}</div>
+</div>`;
+}
+
+/* ===== ROWS ===== */
+function renderRow(title,list,key){
+  if(!list.length) return "";
+  return `
+  <div class="row-header">
+    <h4>${title}</h4>
+    <span class="view-all" onclick="showViewAll('${title}','${key}')">View All</span>
+  </div>
+  <div class="ott-row">
+    ${list.slice(0,15).map(cardHTML).join("")}
+  </div>`;
+}
+
+function showViewAll(title,key){
+  rows.innerHTML=`
+    <div class="row-header">
+      <h4>${title}</h4>
+      <span class="view-all" onclick="renderHome()">⬅ Back</span>
+    </div>
+    <div class="view-all-grid">
+      ${rowData[key].map(cardHTML).join("")}
+    </div>`;
+}
+
+
+function renderHome(){
+  window.rowData={
+latest:[...allPosts].sort(
+  (a,b)=> b.__releaseDate - a.__releaseDate
+),
+  telugu:allPosts.filter(p=>p.language==="Telugu"),
+  hindi:allPosts.filter(p=>p.language==="Hindi"),
+  english:allPosts.filter(p=>p.language==="English")
+};
+
+
+  rows.innerHTML=
+    renderRow("Latest Movies",rowData.latest,"latest")+
+    renderRow("Telugu Movies",rowData.telugu,"telugu")+
+    renderRow("Hindi Movies",rowData.hindi,"hindi")+
+    renderRow("English Movies",rowData.english,"english");
+}
+
+/* ===== DESKTOP CLICK FIX ===== */
+document.addEventListener("click",e=>{
+  const card=e.target.closest(".preview-card");
+  if(card && !isTouch){
+    location.href=`post.html?id=${card.dataset.id}`;
+  }
+});
+
+
+
+/* ===== SEARCH ===== */
+const searchInput=document.getElementById("searchInput");
+const suggestions=document.getElementById("searchSuggestions");
+
+searchInput.addEventListener("input",()=>{
+  const q=searchInput.value.toLowerCase().trim();
+  if(!q){suggestions.style.display="none";return;}
+  const res=allPosts.filter(p=>p.heading.toLowerCase().includes(q)).slice(0,8);
+  if(!res.length){suggestions.style.display="none";return;}
+  suggestions.innerHTML=res.map(p=>`
+    <div class="suggestion" onclick="location.href='post.html?id=${p.id}'">
+      <img src="${p.poster || p.__poster}"><div>${p.heading}</div>
+    </div>`).join("");
+  suggestions.style.display="block";
+});
+
+/* ===== ADVANCED 3D TILT (OPTIONAL) ===== */
+if(!isTouch){
+  document.addEventListener("mousemove", e=>{
+    const card = e.target.closest(".preview-card");
+    if(!card) return;
+
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+
+    const rx = ((y / r.height) - 0.5) * -10;
+    const ry = ((x / r.width) - 0.5) * 10;
+
+    card.style.transform =
+      `perspective(900px)
+       translateY(-10px)
+       rotateX(${rx}deg)
+       rotateY(${ry}deg)
+       scale(1.04)`;
+  });
+
+  document.addEventListener("mouseleave", e=>{
+    const card = e.target.closest(".preview-card");
+    if(card){
+      card.style.transform="";
+    }
+  }, true);
+}
+const heroVideo = document.getElementById('hero-video');
+
+// Hero video hover
+
+
+
+/* ===== INIT (FIXED) ===== */
+(async()=>{
+try{
+  // 1. Load JSON FIRST. The old version tried to process
+  // allPosts before it had been populated.
+  const res=await fetch(POSTS_JSON_URL,{cache:"no-store"});
+  if(!res.ok) throw new Error("posts.json missing ("+res.status+")");
+
+  allPosts=(await res.json()).filter(p=>p.heading||p.tmdbid);
+  if(!allPosts.length) throw new Error("No posts found");
+
+  // 2. Show the page as soon as the JSON is available.
+  // Do not block the entire homepage on dozens of TMDB requests.
+  renderHome();
+  document.getElementById("hero-skeleton")?.remove();
+  document.querySelector(".hero").style.display="block";
+
+  // 3. Pick hero immediately.
+  const hero=allPosts[Math.floor(Math.random()*allPosts.length)];
+  heroTitle.textContent=hero.heading||"Featured";
+  heroLink.href=`post.html?id=${hero.id}`;
+
+  // 4. Use existing poster first, then fetch backdrop in background.
+  heroBg.style.backgroundImage=`url('${hero.poster||hero.__poster||""}')`;
+
+  fetchBackdropSmart(hero).then(backdrop=>{
+    if(backdrop) heroBg.style.backgroundImage=`url('${backdrop}')`;
+  }).catch(()=>{});
+
+  // 5. Hero video only when a normal videoUrl exists.
+  const heroVideo=document.getElementById("hero-video");
+  if(hero.videoUrl){
+    heroVideo.src=hero.videoUrl;
+    heroVideo.onloadedmetadata=()=>{
+      if(!Number.isFinite(heroVideo.duration)||heroVideo.duration<=0)return;
+      const s=heroVideo.duration*.4;
+      const e=heroVideo.duration*.6;
+      heroVideo.currentTime=s+Math.random()*(e-s);
+      heroVideo.play().then(()=>{
+        document.querySelector(".hero").classList.add("video-active");
+      }).catch(()=>{});
+    };
+  }
+
+  // 6. Enrich metadata in the background instead of blocking the page.
+  (async()=>{
+    for(const post of allPosts){
+      try{
+        if(!post.release_date||!post.release_date.trim()){
+          const apiDate=await fetchReleaseDateSmart(post);
+          post.__releaseDate=apiDate?new Date(apiDate):new Date(0);
+        }else{
+          post.__releaseDate=new Date(post.release_date);
+        }
+
+        if(!post.poster){
+          post.__poster=await resolvePoster(post);
+        }
+      }catch(e){
+        console.warn("Metadata skipped:",post.heading,e);
+      }
+    }
+
+    // Re-render after background metadata has finished.
+    renderHome();
+  })();
+
+}catch(err){
+  console.error("Homepage initialization failed:",err);
+  const skeleton=document.getElementById("hero-skeleton");
+  if(skeleton){
+    skeleton.innerHTML=
+      "<h3 style='padding:40px'>Failed to load content</h3>"+
+      "<p style='padding:0 40px;color:#aaa'>Check that posts.json is in the same folder as index.html.</p>";
+  }
+}
+})();
+
+
+</script>
+
+</body>
+</html>
